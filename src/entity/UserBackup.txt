@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, BaseEntity, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, JoinColumn, getRepository, ManyToMany, JoinTable } from "typeorm";
 import Network from './Network';
-import Roles from './Roles';
+import Roles from "./Roles";
 
 @Entity()
 class User extends BaseEntity {
@@ -8,13 +8,13 @@ class User extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type:"varchar", length: 255, nullable: false })
+    @Column()
     str_name: string;
 
-    @Column({ type:"varchar", length: 255, nullable: false })
+    @Column()
     str_username: string;
 
-    @Column({ type:"varchar", length: 255, nullable: false }) 
+    @Column() 
     password: string; 
     
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
@@ -23,8 +23,9 @@ class User extends BaseEntity {
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
     updated_at: string;
 
-    @Column({ type:"varchar", length: 255, nullable: false, default: "Customer" })
-    role: string;    
+    @OneToOne(() => Roles)
+    @JoinColumn()
+    role: Roles;    
 
     @ManyToMany(() => Network)
     @JoinTable()

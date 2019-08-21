@@ -7,7 +7,10 @@ class Network extends BaseEntity {
     id: number;
 
     @Column()
-    name: string;
+    str_cnpj: string;
+
+    @Column()
+    str_name: string;
 
 }
 
