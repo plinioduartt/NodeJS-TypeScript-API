@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Networks from "../entity/Network";
+import Visitors from "../entity/Visitors";
 import { getRepository, getConnection } from "typeorm";
 
 
@@ -12,6 +13,7 @@ class NetworkController {
 
         const networks = await getRepository(Networks)
         .createQueryBuilder("networks")
+        .leftJoinAndSelect("networks.visitor", "visitor")
         .getMany();
 
         return res.json(networks);
@@ -19,11 +21,10 @@ class NetworkController {
     }
 
 
-
     static show = async (req: Request, res: Response) => {
 
         try {
-            var network = await Networks.findOneOrFail({ id: +req.params.id });
+            var network = await Networks.findOneOrFail({ where: {id: +req.params.id}, relations: ['visitor'] });
         } catch (error) {
             return res.status(400).json({ message: "Rede não encontrada"});
         }
@@ -31,6 +32,8 @@ class NetworkController {
 
     }
 
+
+    //Enviar o atributo "visitors" como um array vazio -> []
     static store = async (req: Request, res: Response) => {
 
         const hasNetwork = await Networks.findOne({ str_cnpj: req.body.str_cnpj });
@@ -45,43 +48,75 @@ class NetworkController {
     }
 
 
-
-    //  Este método não adiciona e nem remove usuários da(s) rede(s), apenas edita as descrições&informações da(s) rede(s)
-    // Para adicionar ou remover usuários de alguma rede, utilize os métodos networkAddUser() e networkRmUser() respectivamente
+    //  Este método não adiciona e nem remove visitantes da(s) rede(s), apenas edita as descrições&informações da(s) rede(s)
+    // Para adicionar ou remover visitantes de alguma rede, utilize os métodos networkAddVisitor() e networkRmVisitor() respectivamente
     static update = async (req: Request, res: Response) => {
-
-        try {
-            var network = await Networks.findOneOrFail({ id: +req.params.id });
-        } catch (error) {
-            return res.status(400).json({ message: "Rede não encontrada"});
-        }
-     
-        try {
-            network = await Networks.merge(network, req.body);
-            network.save();
-        } catch (err) {
-            return res.status(500).send("On update network error", err);
-        }
-
-        return res.send(network);
+       
+        var data = req.body;
+        var network = await Networks.findOne({ id: +req.params.id });
+        if (network == null) return res.status(400).json({ message: "Rede não encontrada"});
+        
+        NetworkController.handleVisitors(req, res).then( async (relations: any) => {
+            try {
+                network.visitor = data.visitor = await relations;
+                network = await Networks.merge(network, data);
+                network.save();
+                return res.send(network);
+            } catch (error) {
+                return res.status(500).json({ message: "Erro ao atualizar rede", error: error});
+            }
+        });        
 
     }
-
 
 
     static delete = async (req: Request, res: Response) => {
 
+        var network = await Networks.findOne({ id: +req.params.id });
+        if (network == null) return res.status(400).json({ message: "Rede não encontrada"});
+      
         try {
-            var network = await Networks.findOneOrFail({ id: +req.params.id });
+
+            await Networks.remove(network);
+            return res.status(200).json({ message: "Rede deletada!" });
+        
         } catch (error) {
-            return res.status(400).json({ message: "Rede não encontrada"});
+            return res.status(500).json({ message: "Erro ao deletar rede!", error: error });
         }
-        await Networks.remove(network);
-       
-        return res.status(200).json({ message: "Rede deletada!" });
+        
         
     }
 
+
+    static handleVisitors = async (req, res) => {
+
+       return new Promise( async (resolve) => {
+
+            var visitorsArray = [];
+            const visitorsReq = req.body.visitors;
+
+            // Se não tiver nenhum ID dentro da request, retorna um array vazio logo no início
+            if (visitorsReq.length == 0) resolve([]); 
+
+            await visitorsReq.forEach( async (item, index) => {
+
+                // Verifica se existe alguma rede com este ID
+                const visitor = await Visitors.findOne({ id: item });
+                if (visitor == null) return res.status(400).json({ message: `Visitante de id "${item}" não encontrado.` });
+                
+                visitorsArray.push(visitor);
+                // Sobrescrevendo o array de Networks
+                req.body.visitors = visitorsArray;
+                // Caso seja o último item do foreach, executar...
+                if (index == (visitorsReq.length - 1)) {
+                    resolve(req.body.visitors);
+                }                
+
+            });
+
+        });        
+
+    }
 
 }
 

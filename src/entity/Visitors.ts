@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, JoinColumn, Timestamp } from "typeorm";
-import Roles from "./Roles";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
 
 @Entity()
 class Users extends BaseEntity {
@@ -9,10 +8,6 @@ class Users extends BaseEntity {
 
     @Column({ type: "varchar", length: 255, nullable: false })
     str_name: string;
-    
-    @OneToOne(() => Roles)
-    @JoinColumn()
-    role: Roles;    // chave estrangeira
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
     created_at: string;

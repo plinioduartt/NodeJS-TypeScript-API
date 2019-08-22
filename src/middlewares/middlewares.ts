@@ -7,7 +7,9 @@ class Middlewares extends BaseEntity {
 
     // Rota para verificar se o usuário que enviou a request está autenticado
     static async authMiddleware(req: Request, res: Response, next) {
+
         if (req.headers.authorization == null) return res.status(401).json({ message: "Não autorizado!" });
+        
         const token = await req.headers.authorization.split(" ")[1];
 
         try {
@@ -30,12 +32,14 @@ class Middlewares extends BaseEntity {
     }
 
     static async adminRole(req: Request, res: Response, next) {
+
         const token = await req.headers.authorization.split(" ")[1];
         if (req.headers.authorization == null) return res.status(401).json({ message: "Não autorizado!" });
 
         const decoded = await jwt.decode(token);
         if (decoded.role == "Administrator") next();
         else return res.status(401).json({ message: "Não autorizado!" })
+        
     }
 
 }

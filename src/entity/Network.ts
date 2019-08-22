@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToMany, JoinTable } from 'typeorm';
+import Visitors from "../entity/Visitors";
 
 @Entity()
 class Network extends BaseEntity {
@@ -11,6 +12,10 @@ class Network extends BaseEntity {
 
     @Column()
     str_name: string;
+
+    @ManyToMany(() => Visitors)
+    @JoinTable()
+    visitor: Visitors[];
 
 }
 

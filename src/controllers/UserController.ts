@@ -25,19 +25,20 @@ class UserController {
 
     static store = async (req: Request, res: Response) => {
         
-        const hasUser = await User.find({ str_username: req.body.str_username });
+        var data = req.body;
+        const hasUser = await User.find({ str_username: data.str_username });
         if (hasUser.length > 0) return res.status(400).json({ message: "Usuário já cadastrado!" });
 
         UserController.handleUserNetworks(req, res).then( async (networks) => {
             
-            const role = await Roles.findOneOrFail({ id: req.body.role });
+            const role = await Roles.findOneOrFail({ id: data.role });
 
             var userObj: any =  new User();
-            userObj.str_name = req.body.str_name;
-            userObj.str_username = req.body.str_username;
+            userObj.str_name = data.str_name;
+            userObj.str_username = data.str_username;
             userObj.network  = networks;
             userObj.role     = role;
-            userObj.password = await bcrypt.hash(req.body.password, 10);
+            userObj.password = await bcrypt.hash(data.password, 10);
        
             if(!userObj.save()) return res.status(500).json({ message: "Erro ao cadastrar usuário" });
 
@@ -52,16 +53,18 @@ class UserController {
 
         try {
             var user = await User.findOneOrFail({ where: {id: +req.params.id}, relations: ['role', 'network'] });
+            return res.send(user);
         } catch (error) {
             return res.status(400).json({ message: "Usuário não encontrado"});
         }
-        return res.send(user);
 
     }
 
 
 
     static update = async (req: Request, res: Response) => {
+
+        var data = req.body;
 
         //Seleciona o usuário em questão
         var user = await getRepository(User)
@@ -74,11 +77,11 @@ class UserController {
         if (user == null) return res.status(400).json({ message: "Usuário não encontrado"});
         
         //Verificações básicas
-        if (req.body.role != null) req.body.role = await Roles.findOne({ id: req.body.role });
-        if (req.body.password != null) req.body.password = await bcrypt.hash(req.body.password, 10);
+        if (data.role != null) data.role = await Roles.findOne({ id: data.role });
+        if (data.password != null) data.password = await bcrypt.hash(data.password, 10);
 
         //Verifica se tem novas redes e atualiza de acordo com as mesmas
-        if (req.body.network != null) {
+        if (data.network != null) {
             
             await UserController.handleUserNetworks(req, res).then( async (networks: any) => {
                 user.network = await networks;
@@ -88,7 +91,7 @@ class UserController {
 
         //Por fim, salva o usuário com as novas informações
         try {
-            user = await User.merge(user, req.body);
+            user = await User.merge(user, data);
             user.save();
         } catch (err) {
             return res.status(500).send("On update user error", err);
@@ -102,14 +105,16 @@ class UserController {
 
     static delete = async (req: Request, res: Response) => {
 
+        var user = await User.findOne({ where: {id: +req.params.id}, relations: ['role'] });
+        if (user == null) return res.status(400).json({ message: "Usuário não encontrado"});
+
         try {
-            var user = await User.findOneOrFail({ where: {id: +req.params.id}, relations: ['role'] });
+            await User.remove(user);
+            return res.status(200).json({ message: "Deletado!" });
         } catch (error) {
-            return res.status(400).json({ message: "Usuário não encontrado"});
+            return res.status(500).json({ message: "Erro ao deletar usuário!", error: error});
         }
-        await User.remove(user);
-       
-        return res.status(200).json({ message: "Deletado!" });
+        
     }
 
 
@@ -146,9 +151,10 @@ class UserController {
 
             });
 
-        });        
+        });      
+          
     } 
-    
+
 
 }
 

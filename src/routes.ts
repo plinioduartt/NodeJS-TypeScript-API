@@ -2,6 +2,8 @@ import { Router } from "express";
 import UserController from './controllers/UserController';
 import AuthController from "./controllers/AuthController";
 import NetworkController from "./controllers/NetworkController";
+import VisitorController from "./controllers/VisitorController";
+
 const router = Router();
 const version = "v1";
 import middlewares from "./middlewares/middlewares";
@@ -26,6 +28,12 @@ router.post('/networks/'+version,          m.authMiddleware, m.adminRole, Networ
 router.put('/networks/'+version+'/:id',    m.authMiddleware, m.adminRole, NetworkController.update);
 router.delete('/networks/'+version+'/:id', m.authMiddleware, m.adminRole, NetworkController.delete);
 
+//Rotas do CRUD de visitantes
+router.get('/visitors/'+version,           m.authMiddleware, VisitorController.index);
+router.get('/visitors/'+version+'/:id',    m.authMiddleware, VisitorController.show);
+router.post('/visitors/'+version,          m.authMiddleware, VisitorController.store);
+router.put('/visitors/'+version+'/:id',    m.authMiddleware, VisitorController.update);
+router.delete('/visitors/'+version+'/:id', m.authMiddleware, VisitorController.delete);
 
 
 module.exports = router;

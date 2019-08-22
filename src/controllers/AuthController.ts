@@ -9,16 +9,20 @@ class AuthController {
     static auth = async (req: Request, res: Response) => {
         const { str_username, password } = req.body;
         try {
+
             const user = await User.findOneOrFail({ where: {str_username: str_username}, relations: ['role'] });
 
             if (bcrypt.compareSync(password, user.password)) {
-                const token = await jwt.sign({ role: user.role.str_name, id: user.id }, process.env.SECRET, { expiresIn: 60*60 });
+
+                const token = await jwt.sign({ role: user.role.str_name, id: user.id }, process.env.SECRET, { expiresIn: 60*60*60 });
                 const tokenOBJ = await Tokens.create({ token: token });
                 await tokenOBJ.save();
-                return res.json({ token: token, expiresIn: 60*60 });
+                return res.json({ token: token, expiresIn: 60*60*60 });
+
             } else {
                 return res.status(400).json({ message: "Usuário ou senha inválidos." });
             }
+
         } catch (error) {
             return res.status(400).json({ message: "Usuário inválido!" });
         }
