@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import User from "../entity/User";
 import Roles from "../entity/Roles";
-import { getRepository } from "typeorm";
+import { getRepository, getManager } from "typeorm";
 import bcrypt = require("bcryptjs");
 import Network from "../entity/Network";
 
@@ -12,8 +12,9 @@ class UserController {
     static index = async (req: Request, res: Response) => {
 
         const users = await getRepository(User)
-        .createQueryBuilder("users")
-        .leftJoinAndSelect("users.network", "network")
+        .createQueryBuilder("user")
+        .leftJoinAndSelect("user.network", "network")
+        .leftJoinAndSelect("user.role", "role")
         .getMany();
 
         return res.json(users);
@@ -25,7 +26,7 @@ class UserController {
     static store = async (req: Request, res: Response) => {
         
         const hasUser = await User.find({ str_username: req.body.str_username });
-        if (hasUser != null) return res.status(400).json({ message: "Usuário já cadastrado!" });
+        if (hasUser.length > 0) return res.status(400).json({ message: "Usuário já cadastrado!" });
 
         UserController.handleUserNetworks(req, res).then( async (networks) => {
             
@@ -35,7 +36,7 @@ class UserController {
             userObj.str_name = req.body.str_name;
             userObj.str_username = req.body.str_username;
             userObj.network  = networks;
-            userObj.role     = role.str_name;
+            userObj.role     = role;
             userObj.password = await bcrypt.hash(req.body.password, 10);
        
             if(!userObj.save()) return res.status(500).json({ message: "Erro ao cadastrar usuário" });
@@ -62,21 +63,36 @@ class UserController {
 
     static update = async (req: Request, res: Response) => {
 
-        try {
-            var user = await User.findOneOrFail({ where: {id: +req.params.id}, relations: ['role'] });
-        } catch (error) {
-            return res.status(400).json({ message: "Usuário não encontrado"});
-        }
-     
-        if (req.body.role != null) req.body.role = await Roles.findOne({ str_name: req.body.role });
+        //Seleciona o usuário em questão
+        var user = await getRepository(User)
+        .createQueryBuilder("user")
+        .leftJoinAndSelect("user.network", "network")
+        .leftJoinAndSelect("user.role", "role")
+        .where('user.id = :id', { id: req.params.id })
+        .getOne();
+        
+        if (user == null) return res.status(400).json({ message: "Usuário não encontrado"});
+        
+        //Verificações básicas
+        if (req.body.role != null) req.body.role = await Roles.findOne({ id: req.body.role });
         if (req.body.password != null) req.body.password = await bcrypt.hash(req.body.password, 10);
 
+        //Verifica se tem novas redes e atualiza de acordo com as mesmas
+        if (req.body.network != null) {
+            
+            await UserController.handleUserNetworks(req, res).then( async (networks: any) => {
+                user.network = await networks;
+            });     
+              
+        } 
+
+        //Por fim, salva o usuário com as novas informações
         try {
             user = await User.merge(user, req.body);
             user.save();
         } catch (err) {
             return res.status(500).send("On update user error", err);
-        }
+        }      
 
         return res.send(user);
 
@@ -95,6 +111,7 @@ class UserController {
        
         return res.status(200).json({ message: "Deletado!" });
     }
+
 
 
     static handleUserNetworks = async (req, res) => {
@@ -131,6 +148,7 @@ class UserController {
 
         });        
     } 
+    
 
 }
 

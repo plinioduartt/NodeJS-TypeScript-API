@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, BaseEntity, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, BaseEntity, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
 import Network from './Network';
 import Roles from './Roles';
 
@@ -23,8 +23,9 @@ class User extends BaseEntity {
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
     updated_at: string;
 
-    @Column({ type:"varchar", length: 255, nullable: false, default: "Customer" })
-    role: string;    
+    @ManyToOne(() => Roles)
+    @JoinColumn()
+    role: Roles;    
 
     @ManyToMany(() => Network)
     @JoinTable()
