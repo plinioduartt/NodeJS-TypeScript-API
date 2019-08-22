@@ -31,7 +31,8 @@ class UserController {
 
         UserController.handleUserNetworks(req, res).then( async (networks) => {
             
-            const role = await Roles.findOneOrFail({ id: data.role });
+            const role = await Roles.findOne({ id: data.role });
+            if (role == null) return res.status(400).json({ message: "UserRole não encontrada!" });
 
             var userObj: any =  new User();
             userObj.str_name = data.str_name;
@@ -152,7 +153,7 @@ class UserController {
             });
 
         });      
-          
+
     } 
 
 

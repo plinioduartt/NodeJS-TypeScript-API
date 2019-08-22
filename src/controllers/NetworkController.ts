@@ -84,7 +84,6 @@ class NetworkController {
             return res.status(500).json({ message: "Erro ao deletar rede!", error: error });
         }
         
-        
     }
 
 
