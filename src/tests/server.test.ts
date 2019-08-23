@@ -33,6 +33,7 @@ const options: any = {
        subscribersDir: "src/subscriber"
     }
 };
+
 const connection = createConnection(options).then( async (conn) => {
     return await conn;
 });
@@ -55,22 +56,34 @@ describe('Create roles', () => {
     });
 });
 
-describe('Create user', () => {
-    it('Should create a user', async () => {
+describe('Create a default admin user', () => {
+    it('Should create a default admin user', async () => {
         const conn = await connection;
-        const res = await request(server).get('/');
-        // console.log(res.text);
-        // const user = await new User();
-        //     user.str_name = "Plinio",
-        //     user.str_username = "plinioduartt",
-        //     user.password = "123456",
-        //     user.network = []
-        expect(res.text).toBe('TESTE');
+        const role = await Roles.findOne({ str_name: "Administrator" });
+        const user = new User();
+            user.str_name = await "Administrator";
+            user.str_username = await "admin";
+            user.password = await bcrypt.hash("123456", 10);
+            user.network = await [];
+            user.role = await role;
+        await user.save();
+        expect(user.str_username).toBe('admin');
     });
 });
 
-describe('Revert all migrations', () => {
-    it('Should revert all migrations', async () => {
+describe('Remove all data from database', () => {
+    it('Should remove all data from database', async () => {
+
+        const roles = await getRepository(Roles).createQueryBuilder('roles').getMany();
+        const size = roles.length;
+        await roles.forEach( async (item,index) => {
+            await Roles.remove(roles[index]);
+            if (index == (size - 1)) {
+                const rolesAfterDelete = await getRepository(Roles).createQueryBuilder('roles').getMany();
+                expect(rolesAfterDelete.length).toBe(0);
+            }
+        });
+        
         
     });
 });
