@@ -38,6 +38,16 @@ const connection = createConnection(options).then( async (conn) => {
     return await conn;
 });
 
+
+describe('Check connection', () => {
+    it('Should confirm the connection', async () => {
+        const conn = await connection;
+        const res = await request(server).get('/');
+        expect(res.text).toBe('OK');
+    });
+});
+
+
 describe('Create roles', () => {
     it('Should create all the default roles', async () => {
         const conn = await connection;
@@ -56,24 +66,11 @@ describe('Create roles', () => {
     });
 });
 
-describe('Create a default admin user', () => {
-    it('Should create a default admin user', async () => {
-        const conn = await connection;
-        const role = await Roles.findOne({ str_name: "Administrator" });
-        const user = new User();
-            user.str_name = await "Administrator";
-            user.str_username = await "admin";
-            user.password = await bcrypt.hash("123456", 10);
-            user.network = await [];
-            user.role = await role;
-        await user.save();
-        expect(user.str_username).toBe('admin');
-    });
-});
 
 describe('Remove all data from database', () => {
     it('Should remove all data from database', async () => {
-
+        const conn = await connection;
+        
         const roles = await getRepository(Roles).createQueryBuilder('roles').getMany();
         const size = roles.length;
         await roles.forEach( async (item,index) => {
@@ -83,7 +80,6 @@ describe('Remove all data from database', () => {
                 expect(rolesAfterDelete.length).toBe(0);
             }
         });
-        
         
     });
 });

@@ -10,11 +10,11 @@ import middlewares from "./middlewares/middlewares";
 
 const m = middlewares;
 
-//Autenticação
 router.get('/', (req, res) => {
-    return res.send("TESTE");
+    return res.send("OK");
 });
 
+//Autenticação
 router.post('/auth/'+version, AuthController.auth);
 router.post('/logout/'+version, m.authMiddleware, AuthController.logout);
 
