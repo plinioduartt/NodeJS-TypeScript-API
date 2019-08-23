@@ -1,6 +1,6 @@
 import { BaseEntity } from "typeorm";
 import { Request, Response } from "express";
-import Tokens from "../entity/Tokens";
+import Tokens from "../database/entity/Tokens";
 var jwt = require('jsonwebtoken');
 
 class Middlewares extends BaseEntity {

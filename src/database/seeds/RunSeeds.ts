@@ -10,6 +10,7 @@ class RunSeeds extends BaseEntity{
         }, 3000);
         setTimeout( async () => {
             await UserSeed.seed();
+            return "ok";
         },3000);
     }
     

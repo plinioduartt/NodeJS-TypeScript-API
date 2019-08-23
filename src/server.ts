@@ -1,34 +1,25 @@
+require('dotenv').config({
+    path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env'
+});
+
 import express = require("express");
 import cors = require("cors");
 import bodyParser = require("body-parser");
 import routes = require("./routes");
 import "reflect-metadata";
 import { createConnection } from "typeorm";
+import RunSeeds from "./database/seeds/RunSeeds";
 
-import RunSeeds from "./seeds/RunSeeds";
-
-
-const PORT = 3000;
-const HOST = "0.0.0.0";
 const app = express();
+app.use(routes);
 
 createConnection().then(async (conn) => {
-
+    await conn.runMigrations();
+    await RunSeeds.run();
     
-    // Inicia as migrations e seeds no banco...
-        await conn.runMigrations();
-        //seeds
-        await RunSeeds.run();
-    //--
-
-    app.use(cors());
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
-
-    app.use(routes);
-
-    app.listen(PORT, HOST, (req, res) => {
-        console.log(`plinioduartt@api Online na porta: ${PORT}`);
-    });
-
+    await app.use(cors());
+    await app.use(bodyParser.json());
+    await app.use(bodyParser.urlencoded({ extended: true }));
 }).catch(error => console.log(error));
+
+export default app;

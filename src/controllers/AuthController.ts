@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import User from "../entity/User";
-import Tokens from "../entity/Tokens";
+import User from "../database/entity/User";
+import Tokens from "../database/entity/Tokens";
 import bcrypt = require("bcryptjs");
 var jwt = require('jsonwebtoken');
 

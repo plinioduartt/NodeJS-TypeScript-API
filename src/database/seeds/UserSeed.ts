@@ -1,6 +1,6 @@
 import { getRepository, BaseEntity } from "typeorm";
-import User from "../database/entity/User";
-import Roles from "../database/entity/Roles";
+import User from "../entity/User";
+import Roles from "../entity/Roles";
 import bcrypt = require("bcryptjs");
 
 class UserSeed extends BaseEntity {

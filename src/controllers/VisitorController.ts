@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Visitors from "../entity/Visitors";
+import Visitors from "../database/entity/Visitors";
 import { getRepository } from "typeorm";
 
 

@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import User from "../entity/User";
-import Roles from "../entity/Roles";
+import User from "../database/entity/User";
+import Roles from "../database/entity/Roles";
 import { getRepository, getManager } from "typeorm";
 import bcrypt = require("bcryptjs");
-import Network from "../entity/Network";
+import Network from "../database/entity/Network";
 
 
 

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Networks from "../entity/Network";
-import Visitors from "../entity/Visitors";
+import Networks from "../database/entity/Network";
+import Visitors from "../database/entity/Visitors";
 import { getRepository, getConnection } from "typeorm";
 
 
