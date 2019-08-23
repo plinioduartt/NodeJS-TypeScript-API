@@ -1,9 +1,7 @@
 import request = require("supertest");
 import server from "../server";
-import User from "../database/entity/User";
 import Roles from "../database/entity/Roles";
-import RunSeeds from '../database/seeds/RunSeeds';
-import { getManager, getRepository, createQueryBuilder } from "typeorm";
+import {  getRepository } from "typeorm";
 import bcrypt = require("bcryptjs");
 import { createConnection } from "typeorm";
 const version = "v1";
