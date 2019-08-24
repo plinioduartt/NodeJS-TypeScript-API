@@ -1,0 +1,600 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "API@plinioduartt",
+        "description": "API feita utilizando conceitos básicos de NodeJS, TypeScript, Typeorm, Docker, Swagger e Testes unitários e de integração.",
+        "license": {
+            "name": "github/plinioduart",
+            "url": "https://github.com/plinioduartt"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1",
+            "description": "Local"
+        },
+        {
+            "url": "Indisponível/Configurável",
+            "description": "Máquina Virtual"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Users",
+            "description": "CRUD de usuários. OBS* Todas essas rotas são protegidas com middlewares de autenticação e Admin Role."
+        }
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/users/v1": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Retorna todos os usuários do sistema",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/users"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Cria um novo usuário no sistema",
+                "requestBody": {
+                    "description": "User Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/users"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/users"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    }
+                }
+            }
+        },
+        "/users/v1/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID do usuário que deseja encontrar",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Retorna um usuário a partir do ID",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "User with id",
+                        "schema": {
+                            "$ref": "#/definitions/id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/users"
+                        }
+                    },
+                    "404": {
+                        "description": "Failed. User not found."
+                    }
+                }
+            },
+            "put": {
+                "summary": "Atualiza um usuário a partir do ID fornecido",
+                "tags": [
+                    "Users"
+                ],
+                "requestBody": {
+                    "description": "User Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/users"
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "User com os novos valores",
+                        "schema": {
+                            "$ref": "#/definitions/users"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    },
+                    "404": {
+                        "description": "Failed. User not found."
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Deleta um usuário a partir do ID",
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Deleta um usuário a partir do ID",
+                        "schema": {
+                            "$ref": "#/definitions/users"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/id"
+                        }
+                    },
+                    "404": {
+                        "description": "Failed. User not found."
+                    }
+                }
+            }
+        },
+        "/auth/v1": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Autentica o usuário",
+                "requestBody": {
+                    "description": "User Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/auth"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    }
+                }
+            }
+        },
+        "/visitor/v1": {
+            "get": {
+                "tags": [
+                    "Visitor"
+                ],
+                "summary": "Retorna todas as redes do sistema",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/visitor"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Visitor"
+                ],
+                "summary": "Cria uma nova rede no sistema",
+                "requestBody": {
+                    "description": "Visitor Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/visitor"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/visitor"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    }
+                }
+            }
+        },
+        "/visitor/v1/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID da rede que deseja encontrar",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Visitor"
+                ],
+                "summary": "Retorna uma rede a partir do ID",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Visitor with id",
+                        "schema": {
+                            "$ref": "#/definitions/id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/visitor"
+                        }
+                    },
+                    "404": {
+                        "description": "Failed. Visitor not found."
+                    }
+                }
+            },
+            "put": {
+                "summary": "Atualiza uma rede a partir do ID fornecido",
+                "tags": [
+                    "Visitor"
+                ],
+                "requestBody": {
+                    "description": "Visitor Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/visitor"
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Visitor com os novos valores",
+                        "schema": {
+                            "$ref": "#/definitions/visitor"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/visitor"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    },
+                    "404": {
+                        "description": "Failed. Visitor not found."
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Deleta uma rede a partir do ID",
+                "tags": [
+                    "Visitor"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Deleta uma rede a partir do ID",
+                        "schema": {
+                            "$ref": "#/definitions/visitor"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/id"
+                        }
+                    },
+                    "404": {
+                        "description": "Failed. Visitor not found."
+                    }
+                }
+            }
+        },
+        "/network/v1": {
+            "get": {
+                "tags": [
+                    "Network"
+                ],
+                "summary": "Retorna todas as redes do sistema",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/network"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Network"
+                ],
+                "summary": "Cria uma nova rede no sistema",
+                "requestBody": {
+                    "description": "Network Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/network"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/network"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    }
+                }
+            }
+        },
+        "/network/v1/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID da rede que deseja encontrar",
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Network"
+                ],
+                "summary": "Retorna uma rede a partir do ID",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Network with id",
+                        "schema": {
+                            "$ref": "#/definitions/id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/network"
+                        }
+                    },
+                    "404": {
+                        "description": "Failed. Network not found."
+                    }
+                }
+            },
+            "put": {
+                "summary": "Atualiza uma rede a partir do ID fornecido",
+                "tags": [
+                    "Network"
+                ],
+                "requestBody": {
+                    "description": "Network Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/network"
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Network com os novos valores",
+                        "schema": {
+                            "$ref": "#/definitions/network"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Network"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    },
+                    "404": {
+                        "description": "Failed. Network not found."
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Deleta uma rede a partir do ID",
+                "tags": [
+                    "Network"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Deleta uma rede a partir do ID",
+                        "schema": {
+                            "$ref": "#/definitions/network"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/id"
+                        }
+                    },
+                    "404": {
+                        "description": "Failed. Network not found."
+                    }
+                }
+            }
+        }
+    },
+    
+    
+    "definitions": {
+        "id": {
+            "properties": {
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "users": {
+            "type": "object",
+            "properties": {
+                "str_name": {
+                    "type": "string"
+                },
+                "str_username": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "object"
+                },
+                "network": {
+                    "type": "object"
+                }
+            }
+        },
+        "network": {
+            "type": "object",
+            "properties": {
+                "str_name": {
+                    "type": "string"
+                },
+                "visitors": {
+                    "type": "object"
+            
+                }
+            }
+        },
+        "auth": {
+            "type": "object",
+            "properties": {
+                "str_username": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "visitor": {
+            "type": "object",
+            "properties": {
+                "str_name": {
+                    "type": "string"
+                }
+            }
+        }
+       
+    }
+}

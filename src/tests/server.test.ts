@@ -4,42 +4,22 @@ import Roles from "../database/entity/Roles";
 import {  getRepository } from "typeorm";
 import bcrypt = require("bcryptjs");
 import { createConnection } from "typeorm";
+import config from "../../ormconfig";
+import User from "../database/entity/User";
+import bodyParser = require('body-parser');
+import cors = require('cors');
+import chai = require('chai')
+import chaiHttp = require('chai-http');
+chai.use(chaiHttp);
+
+import request2 = require('request');
+
+const token = '';
 const version = "v1";
-
-const options: any = {
-    name: "default",
-    type: "mysql",
-    host: "localhost",
-    port: 3306,
-    username: "root",
-    password: "focal1320",
-    database: process.env.DB_NAME,
-    synchronize: true,
-    logging: false,
-    entities: [
-       "src/database/entity/**/*.ts"
-    ],
-    migrations: [
-       "src/migration/**/*.ts"
-    ],
-    subscribers: [
-       "src/subscriber/**/*.ts"
-    ],
-    cli: {
-       entitiesDir: "src/database/entity",
-       migrationsDir: "src/migration",
-       subscribersDir: "src/subscriber"
-    }
-};
-
-const connection = createConnection(options).then( async (conn) => {
-    return await conn;
-});
-
 
 describe('Check connection', () => {
     it('Should confirm the connection', async () => {
-        const conn = await connection;
+        const connection = await createConnection(config);
         const res = await request(server).get('/');
         expect(res.text).toBe('OK');
     });
@@ -48,7 +28,6 @@ describe('Check connection', () => {
 
 describe('Create roles', () => {
     it('Should create all the default roles', async () => {
-        const conn = await connection;
         var admin = new Roles();
             admin.str_desc = "Administrator role";
             admin.str_name = "Administrator";
@@ -58,45 +37,94 @@ describe('Create roles', () => {
             customer.str_desc = "Customer role";
             customer.str_name = "Customer";
             await customer.save();
+            
         
         const roles = await getRepository(Roles).createQueryBuilder('roles').getMany();
-        expect(roles.length).toBe(2);
+        expect(roles.length).toBeGreaterThan(0);
+    });
+});
+
+
+describe('Create default user', () => {
+    it('Should create a default admin user', async () => {
+        const role = await Roles.findOne({ str_name: "Administrator" });
+
+        var user = new User();
+            user.str_name = "Administrator";
+            user.str_username = "admin";
+            user.password = await bcrypt.hash("123456", 10);
+            user.role = role;
+            user.network = [];
+        const res = await user.save();
+        
+        expect(res).toBeTruthy();
+    });
+});
+
+
+describe('Authenticate with admin user', () => {
+    it('Should authenticate with admin user', async () => {
+        
+        const credentials = { str_username: 'admin', password: '123456' };
+
+        await server.use(cors());
+        await server.use(bodyParser.json());
+        await server.use(bodyParser.urlencoded({ extended: true }));
+
+        const response = await request(server)
+            .post('/auth/'+version)
+            .set('Content-Type', "application/json")
+            .send(credentials);
+
+            expect(response).toHaveProperty('token');
+
+            console.log(response.status);
+
+        // this.token = await response.body.token;
+        // expect(response).toHaveProperty('token');
+    });
+});
+
+
+describe('Create a user without authenticate', () => {
+    it('Should revoke to create a user', async () => {
+        const role = await Roles.findOne({ str_name: "Customer" });
+
+        const userOBJ = { 
+            str_name: 'plinio',
+            str_username: 'plinioduartt', 
+            password: '123456', 
+            role: role,
+            network: []
+        };
+        
+        const response = await request(server)
+            .post('/users/'+version)
+            .send(userOBJ);
+
+        // this.token = await response.body.token;
+        expect(response.status).toBe(401);
     });
 });
 
 
 describe('Remove all data from database', () => {
-    it('Should remove all data from database', async () => {
-        const conn = await connection;
-        
+    it('Should remove all data from database', async () => {     
+        const users = await getRepository(User).createQueryBuilder('user').getMany();
         const roles = await getRepository(Roles).createQueryBuilder('roles').getMany();
-        const size = roles.length;
-        await roles.forEach( async (item,index) => {
-            await Roles.remove(roles[index]);
-            if (index == (size - 1)) {
-                const rolesAfterDelete = await getRepository(Roles).createQueryBuilder('roles').getMany();
-                expect(rolesAfterDelete.length).toBe(0);
-            }
-        });
+        
+        await User.remove(users);
+        const usersAfterDelete = await getRepository(User).createQueryBuilder('user').getMany();
+        expect(usersAfterDelete.length).toBe(0);
+
+        await Roles.remove(roles);
+        const rolesAfterDelete = await getRepository(Roles).createQueryBuilder('roles').getMany();
+        expect(rolesAfterDelete.length).toBe(0);
         
     });
 });
 
-// describe('Run seeds', () => {
-//     it('Should create all the default data', async () => {
-//         const entityManager = await getManager();
-//         const userRepository = await getRepository(Roles); // you can also get it via getConnection().getRepository() or getManager().getRepository()
-//         const role = await userRepository.findOne({ str_name: "Administrator" });
 
-//         var user = new User();
-//             user.str_name = await "Admin";
-//             user.str_username = await "admin";
-//             user.network = await [];
-//             user.password = await bcrypt.hash("123456", 10);
-//             user.role = await role;
-//         expect(user.str_name).toBe('admin');
-//     });
-// });
 
 
     

@@ -7,12 +7,17 @@ import VisitorController from "./controllers/VisitorController";
 const router = Router();
 const version = "v1";
 import middlewares from "./middlewares/middlewares";
+import swagger from "swagger-ui-express";
+import * as swaggerDoc from "./swagger.json";
 
 const m = middlewares;
 
 router.get('/', (req, res) => {
     return res.send("OK");
 });
+
+//Documentação
+router.use('/docs/'+version, swagger.serve, swagger.setup(swaggerDoc));
 
 //Autenticação
 router.post('/auth/'+version, AuthController.auth);

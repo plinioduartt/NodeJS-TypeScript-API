@@ -9,11 +9,13 @@ import routes = require("./routes");
 import "reflect-metadata";
 import { createConnection } from "typeorm";
 import RunSeeds from "./database/seeds/RunSeeds";
+import config from "../ormconfig";
 
-const app = express();
+
+const app = new express();
 app.use(routes);
 
-createConnection().then(async (conn) => {
+createConnection(config).then(async (conn) => {
     await conn.runMigrations();
     await RunSeeds.run();
     

@@ -2,15 +2,16 @@ require('dotenv').config({
    path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env'
 });
 
-console.log("DB NAME -->", process.env.DB_NAME);
+import { ConnectionOptions } from "typeorm";
 
-module.exports = {
+
+const config: ConnectionOptions = {
    "name": "default",
-   "type": "mysql",
-   "host": "localhost",
-   "port": 3306,
-   "username": "root",
-   "password": "focal1320",
+   "type": "postgres",
+   "host": "192.168.99.100",
+   "port": 5432,
+   "username": "postgres",
+   "password": "123456",
    "database": process.env.DB_NAME,
    "synchronize": true,
    "logging": false,
@@ -29,3 +30,5 @@ module.exports = {
       "subscribersDir": "src/subscriber"
    }
 };
+
+export default config;
