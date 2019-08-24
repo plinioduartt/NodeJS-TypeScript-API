@@ -28,6 +28,7 @@ Antes de executar NPM START e iniciar o servidor, clone a imagem do banco de dad
   
 Para criar a imagem no docker, rode o comando -> 
 - docker-compose up --build
+- atualize o endereço HOST no arquivo .env
 
 Para iniciar o servidor, rode -> 
 - NPM START
