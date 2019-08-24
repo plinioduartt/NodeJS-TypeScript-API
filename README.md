@@ -16,6 +16,7 @@ Caso dê erros rode ->
 - npm install body-parser --save
 
 
+DATABASE
 Antes de executar NPM START e iniciar o servidor, clone a imagem do banco de dados POSTGRES no docker!
 
 - docker pull postgres:alpine
@@ -24,7 +25,6 @@ Antes de executar NPM START e iniciar o servidor, clone a imagem do banco de dad
 - psql -U postgres
 - CREATE DATABASE crud;
 - CREATE DATABASE crudtests;
-   
   
 Para criar a imagem no docker, rode o comando -> 
 - docker-compose up --build
