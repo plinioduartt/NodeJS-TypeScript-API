@@ -32,6 +32,7 @@ Para criar a imagem no docker, rode o comando ->
 
 Para iniciar o servidor, rode -> 
 - NPM START
+- OBS: Necessário mudar no código o endereço de HOST da conexão com o banco, pois no desenvolimento foi feito a partir de uma VM.
 
 Assim que o servidor estiver online, ele executará as migrations e as seeders, criando um usuário padrão com os seguintes dados:
  - str_username: admin
