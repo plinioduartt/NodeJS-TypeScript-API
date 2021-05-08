@@ -10,7 +10,7 @@
       "nodemon": "^1.19.1",
       "supertest": "^4.0.2",
       "ts-node": "^3.3.0",
-      "typeorm": "^0.2.18",
+      "typeorm": "^0.2.25",
       "typescript": "^3.3.3333"
    },
    "dependencies": {
